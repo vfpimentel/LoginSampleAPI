@@ -44,10 +44,10 @@ public class AutenticacaoController {
         var tokenJWT = tokenService.gerarToken((Usuario) authentication.getPrincipal());
         usuario.setToken(tokenJWT);
         usuario.setLastAccess(LocalDateTime.now());
-        return ResponseEntity.ok(new JWTTokenTO(tokenJWT));
+        return ResponseEntity.ok(new JWTTokenTO(usuario.getLogin(),tokenJWT));
     }
 
-    @DeleteMapping()
+    @DeleteMapping
     @Transactional
     public ResponseEntity logout(HttpServletRequest request) {
         var tokenJWT = tokenService.getToken(request);
@@ -57,7 +57,7 @@ public class AutenticacaoController {
         //localiza o usuário pelo login
         var usuario = usuarioRepository.findUserByToken(tokenJWT);
         if (usuario == null) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.ok("Usuario não encontrado.");
         }
         usuario.setLastAccess(null);
         usuario.setToken(null);
